@@ -86,7 +86,11 @@ if ('transactions' === $view) {
         $dateTo = new DateTime($date_to);
     }
 
-    $rbkMoneyAdmin->transactions_show($pageNumber, $dateFrom, $dateTo);
+    $rbkMoneyAdmin->transactions_show(
+        $dateFrom,
+        $dateTo,
+        empty($token) ? null : $token
+    );
 } else {
 // Show form method
     $rbkMoneyAdmin->$methodShow();

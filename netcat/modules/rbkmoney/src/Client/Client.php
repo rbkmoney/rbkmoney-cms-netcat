@@ -66,21 +66,10 @@ class Client implements ClientInterface
         $this->apiKey = $apiKey;
         $this->shopId = $shopId;
         $this->url = $url;
-
-        $this->setHeaders();
-    }
-
-    /**
-     * Устанавливает хедеры
-     *
-     * @return void
-     */
-    private function setHeaders()
-    {
         $this->headers = [
             self::CONTENT_TYPE,
             self::AUTHORIZATION . $this->apiKey,
-            self::REQUEST_ID . $this->shopId,
+            self::REQUEST_ID . md5(uniqid(rand(), true)),
         ];
     }
 
@@ -129,7 +118,7 @@ class Client implements ClientInterface
 
         $headers = '';
 
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function($ch, $header_line) use (&$headers) {
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header_line) use (&$headers) {
             $headers .= trim($header_line);
 
             return strlen($header_line);

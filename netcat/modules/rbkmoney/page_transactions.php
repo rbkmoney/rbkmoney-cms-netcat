@@ -81,19 +81,9 @@
     <table>
         <tr>
             <?php
-            if (!empty($this->previousUrl)) {
-                echo '<td><a href="' . $this->previousUrl.'"><<' . PREVIOUS . '</a></td>';
-            }
-            foreach ($this->pages as $page) {
-                if ($page['isCurrent'] || '...' === $page['num']) {
-                    echo '<td>' . $page['num'] . '</td>';
-                } else {
-                    echo '<td><a href="' . $page['url'].'">'. $page['num'] . '</a></td>';
+                if (!empty($this->nextUrl)) {
+                    echo '<td><a href="' . $this->nextUrl . '">' . NEXT . ' >></a></td>';
                 }
-            }
-            if (!empty($this->nextUrl)) {
-                echo '<td><a href="' . $this->nextUrl.'">' . NEXT . ' >></a></td>';
-            }
             ?>
         </tr>
     </table>

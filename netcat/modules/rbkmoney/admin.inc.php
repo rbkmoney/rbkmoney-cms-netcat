@@ -12,7 +12,6 @@ use src\Client\Client;
 use src\Client\Sender;
 use src\Exceptions\RequestException;
 use src\Helpers\Logger;
-use src\Helpers\Paginator;
 
 class RbkMoneyAdmin
 {
@@ -30,19 +29,9 @@ class RbkMoneyAdmin
     protected $transactions = [];
 
     /**
-     * @var string
-     */
-    protected $previousUrl;
-
-    /**
-     * @var string
+     * @var string | null
      */
     protected $nextUrl;
-
-    /**
-     * @var array
-     */
-    protected $pages = [];
 
     /**
      * @var array
@@ -237,17 +226,21 @@ class RbkMoneyAdmin
     }
 
     /**
-     * @param          $page
-     * @param DateTime $fromTime
-     * @param DateTime $toTime
-     * @param int      $limit
+     * @param DateTime     $fromTime
+     * @param DateTime     $toTime
+     * @param string |null $token
+     * @param int          $limit
      *
      * @throws RequestException
      * @throws WrongDataException
      * @throws WrongRequestException
      */
-    public function transactions_show($page, DateTime $fromTime, DateTime $toTime, $limit = 10)
-    {
+    public function transactions_show(
+        DateTime $fromTime,
+        DateTime $toTime,
+        $token = null,
+        $limit = 10
+    ) {
         try {
             if (!$this->settings['apiKey']) {
                 throw new WrongDataException(ERROR_API_KEY_IS_NOT_VALID, HTTP_CODE_BAD_REQUEST);
@@ -272,7 +265,10 @@ class RbkMoneyAdmin
         $sender = new Sender(new Client($this->settings['apiKey'], $shopId, RBK_MONEY_API_URL_SETTING));
 
         $paymentRequest = new SearchPaymentsRequest($shopId, $fromTime, $toTime, $limit);
-        $paymentRequest->setOffset(($page * $limit) - $limit);
+
+        if (!empty($token)) {
+            $paymentRequest->setContinuationToken($token);
+        }
 
         $payments = $sender->sendSearchPaymentsRequest($paymentRequest);
 
@@ -306,16 +302,14 @@ class RbkMoneyAdmin
             ];
         }
 
-        $domain = nc_core('catalogue')->get_current('Domain');
-        $rbkMoneyPath = nc_core('catalogue')->get_url_by_host_name($domain) . nc_module_path('rbkmoney');
-        $pagePath = $rbkMoneyPath . 'admin.php?view=transactions&page=(:num)';
-        $date = "&date_from={$fromTime->format('d.m.Y')}&date_to={$toTime->format('d.m.Y')}";
+        if (!empty($payments->continuationToken)) {
+            $domain = nc_core('catalogue')->get_current('Domain');
+            $rbkMoneyPath = nc_core('catalogue')->get_url_by_host_name($domain) . nc_module_path('rbkmoney');
+            $nextPagePath =  "{$rbkMoneyPath}admin.php?view=transactions&token=$payments->continuationToken";
+            $nextUrl = "$nextPagePath&date_from={$fromTime->format('d.m.Y')}&date_to={$toTime->format('d.m.Y')}";
+        }
 
-        $paginator = new Paginator($payments->totalCount, $limit, $page, "$pagePath?$date");
-
-        $this->previousUrl = $paginator->getPrevUrl();
-        $this->nextUrl = $paginator->getNextUrl();
-        $this->pages = $paginator->getPages();
+        $this->nextUrl = empty($nextUrl) ? null : $nextUrl;
 
         require_once($this->moduleFolder . 'rbkmoney/page_transactions.php');
     }

@@ -27,7 +27,7 @@ define('PROPERTY_DESCRIPTION', 'description');
 define('PROPERTY_INVOICE_TEMPLATE_ID', 'invoiceTemplateID');
 define('PROPERTY_CART', 'cart');
 define('PROPERTY_PAYMENT_TOOL', 'paymentTool');
-define('PROPERTY_TOTAL_COUNT', 'totalCount');
+define('PROPERTY_CONTINUATION_TOKEN', 'continuationToken');
 define('PROPERTY_RESULT', 'result');
 define('PROPERTY_SHOP_ID', 'shopID');
 define('PROPERTY_FEE', 'fee');

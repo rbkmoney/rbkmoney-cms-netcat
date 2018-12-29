@@ -11,9 +11,9 @@ class SearchPaymentsResponse extends RBKmoneyDataObject implements ResponseInter
 {
 
     /**
-     * @var int | null
+     * @var string | null
      */
-    public $totalCount;
+    public $continuationToken;
 
     /**
      * @var array | Payment[] | null
@@ -27,8 +27,8 @@ class SearchPaymentsResponse extends RBKmoneyDataObject implements ResponseInter
      */
     public function __construct(stdClass $response)
     {
-        if (property_exists($response, PROPERTY_TOTAL_COUNT)) {
-            $this->totalCount = $response->{PROPERTY_TOTAL_COUNT};
+        if (property_exists($response, PROPERTY_CONTINUATION_TOKEN)) {
+            $this->continuationToken = $response->{PROPERTY_CONTINUATION_TOKEN};
         }
 
         if (property_exists($response, PROPERTY_RESULT)) {
